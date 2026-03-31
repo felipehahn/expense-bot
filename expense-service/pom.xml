@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.expensebot</groupId>
-	<artifactId>expensive-service</artifactId>
+	<artifactId>expense-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>expensive-service</name>
 	<description>Consumes expense events and persists them to the database</description>

@@ -34,4 +34,16 @@ public class Expense {
 
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
+
+    public static Expense create(User user, String description, Double amount) {
+        LocalDateTime now = LocalDateTime.now();
+
+        Expense expense = new Expense();
+        expense.setUser(user);
+        expense.setDescription(description);
+        expense.setAmount(amount);
+        expense.setCreatedAt(now);
+        expense.setUpdatedAt(now);
+        return expense;
+    }
 }
