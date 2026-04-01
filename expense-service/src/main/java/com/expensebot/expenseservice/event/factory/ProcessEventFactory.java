@@ -1,6 +1,6 @@
 package com.expensebot.expenseservice.event.factory;
 
-import com.expensebot.expenseservice.event.contract.IProcessEventService;
+import com.expensebot.expenseservice.event.contract.EventHandler;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -11,14 +11,14 @@ import java.util.stream.Collectors;
 @Service
 public class ProcessEventFactory {
 
-    private final Map<String, IProcessEventService> handlers;
+    private final Map<String, EventHandler> handlers;
 
-    public ProcessEventFactory(List<IProcessEventService> processEvents) {
+    public ProcessEventFactory(List<EventHandler> processEvents) {
         this.handlers = processEvents.stream()
-                .collect(Collectors.toMap(IProcessEventService::getCommand, Function.identity()));
+                .collect(Collectors.toMap(EventHandler::getCommand, Function.identity()));
     }
 
-    public IProcessEventService getHandler(String command) {
+    public EventHandler getHandler(String command) {
         return handlers.getOrDefault(command, handlers.get("/default"));
     }
 }

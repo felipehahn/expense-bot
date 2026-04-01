@@ -28,6 +28,10 @@ public class User {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
+    public User(Long id) {
+        this.id = id;
+    }
+
     public static User create(Long telegramId, String name) {
         User user = new User();
         user.setTelegramId(telegramId);

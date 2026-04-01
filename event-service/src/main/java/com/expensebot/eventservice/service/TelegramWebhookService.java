@@ -27,13 +27,14 @@ public class TelegramWebhookService {
 
     private void publishCommandEvent(TelegramUpdateDTO update) {
         TelegramMessageDTO message = update.getMessage();
+        String[] messageTextParts = message.getText().split(" ", 2);
 
         TelegramCommandEvent event = new TelegramCommandEvent(
                 message.getChat().getId(),
                 message.getFrom().getId(),
                 buildUserName(message),
-                message.getText().split(" ")[0],
-                message.getText(),
+                messageTextParts[0],
+                messageTextParts.length > 1 ? messageTextParts[1] : "",
                 message.getMessageId()
         );
 

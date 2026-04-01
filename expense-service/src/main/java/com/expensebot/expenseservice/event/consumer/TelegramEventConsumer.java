@@ -1,7 +1,7 @@
 package com.expensebot.expenseservice.event.consumer;
 
 import com.expensebot.contracts.event.TelegramCommandEvent;
-import com.expensebot.expenseservice.event.contract.IProcessEventService;
+import com.expensebot.expenseservice.event.contract.EventHandler;
 import com.expensebot.expenseservice.event.factory.ProcessEventFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -19,7 +19,7 @@ public class TelegramEventConsumer {
 
     @KafkaListener(topics = "expense-events")
     public void consume(TelegramCommandEvent event) {
-        IProcessEventService service = processEventFactory.getHandler(event.command());
+        EventHandler service = processEventFactory.getHandler(event.command());
         service.process(event);
     }
 }

@@ -8,7 +8,7 @@ CREATE TABLE users (
 CREATE TABLE expenses (
     id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL,
-    amount DOUBLE PRECISION NOT NULL,
+    amount DECIMAL(10,2) NOT NULL,
     description VARCHAR(30) NOT NULL,
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL,
