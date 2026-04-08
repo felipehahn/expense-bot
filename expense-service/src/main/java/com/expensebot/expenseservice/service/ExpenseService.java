@@ -17,9 +17,9 @@ public class ExpenseService {
     @Autowired
     UserRepository userRepository;
 
-    public Expense create(Long telegramUserId, ExpenseDTO expenseCommand) {
+    public Expense create(Long telegramUserId, ExpenseDTO expenseDTO) {
         User user = userRepository.findByTelegramId(telegramUserId).orElseThrow();
-        return expenseRepository.save(Expense.create(user, expenseCommand.description(), expenseCommand.amount()));
+        return expenseRepository.save(Expense.create(user, expenseDTO));
     }
 
     public void delete(Long expenseId) {

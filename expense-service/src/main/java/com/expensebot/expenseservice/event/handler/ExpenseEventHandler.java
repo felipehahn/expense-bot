@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 @Service
 public class ExpenseEventHandler implements EventHandler {
@@ -22,20 +25,21 @@ public class ExpenseEventHandler implements EventHandler {
 
     @Override
     public void process(TelegramCommandEvent event) {
-        ExpenseDTO expenseCommand = parse(event.text());
-        expenseService.create(event.userId(), expenseCommand);
+        ExpenseDTO expenseDTO = parse(event.text());
+        expenseService.create(event.userId(), expenseDTO);
     }
 
     private ExpenseDTO parse(String text) {
-        String[] parts = text.split(" ", 2);
+        String[] parts = text.split("\\|", 3);
 
         if (parts.length < 2)
             throw new IllegalArgumentException("Formato inválido. Use: /despesa <valor> <descrição>");
 
-        BigDecimal amount = parseAmount(parts[0]);
-        String description = parts[1];
+        BigDecimal amount = parseAmount(parts[0].trim());
+        String description = parts[1].trim();
+        LocalDate dataDespesa = parseData(parts.length > 2 ? parts[2].trim() : null);
 
-        return new ExpenseDTO(amount, description);
+        return new ExpenseDTO(amount, description, dataDespesa);
     }
 
     private BigDecimal parseAmount(String amountString) {
@@ -45,6 +49,17 @@ public class ExpenseEventHandler implements EventHandler {
             return new BigDecimal(normalized);
         } catch (Exception e) {
             throw new IllegalArgumentException("Valor inválido: " + amountString);
+        }
+    }
+
+    private LocalDate parseData(String dateString) {
+        try {
+            if (dateString == null || dateString.isBlank())
+                return LocalDate.now();
+
+            return LocalDate.parse(dateString, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("Data inválida: " + dateString + ". Use o formato dd/MM/yyyy");
         }
     }
 }

@@ -29,7 +29,6 @@ public class DeleteExpenseEventHandler implements EventHandler {
         if (parts.length != 1)
             throw new IllegalArgumentException("Formato inválido. Use: /despesa <valor> <descrição>");
 
-        Long expenseId = Long.parseLong(parts[0]);
-        return expenseId;
+        return Long.parseLong(parts[0]);
     }
 }

@@ -10,6 +10,7 @@ CREATE TABLE expenses (
     user_id BIGINT NOT NULL,
     amount DECIMAL(10,2) NOT NULL,
     description VARCHAR(30) NOT NULL,
+    data DATE NOT NULL,
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL,
     CONSTRAINT fk_expenses_user FOREIGN KEY (user_id) REFERENCES users (id)
