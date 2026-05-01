@@ -14,7 +14,7 @@ public class UserSessionRepository {
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
 
-    public void save(String userId, UserSession session) {
+    public void save(Long userId, UserSession session) {
         redisTemplate.opsForValue().set(PREFIX + userId, session, TTL);
     }
 

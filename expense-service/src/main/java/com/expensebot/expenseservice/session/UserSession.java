@@ -11,5 +11,11 @@ import java.util.Map;
 public class UserSession {
     private String command;
     private UserSessionStep step;
-    private Map<String, String> data = new HashMap<>();
+    private Map<String, Object> data = new HashMap<>();
+
+    public UserSession (String command, UserSessionStep step) {
+        this.command = command;
+        this.step = step;
+        this.data = new HashMap<String, Object>();
+    }
 }

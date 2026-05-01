@@ -1,1 +1,2 @@
 com\expensebot\contracts\event\TelegramCommandEvent.class
+com\expensebot\contracts\event\TelegramResponseEvent.class

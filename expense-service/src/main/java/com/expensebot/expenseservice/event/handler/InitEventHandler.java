@@ -3,6 +3,7 @@ package com.expensebot.expenseservice.event.handler;
 import com.expensebot.contracts.event.TelegramCommandEvent;
 import com.expensebot.expenseservice.event.contract.EventHandler;
 import com.expensebot.expenseservice.service.UserService;
+import com.expensebot.expenseservice.session.UserSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +19,7 @@ public class InitEventHandler implements EventHandler {
     }
 
     @Override
-    public void process(TelegramCommandEvent event) {
+    public void process(TelegramCommandEvent event, UserSession session) {
         userService.createIfNotExists(event.userId(), event.userName());
     }
 }
