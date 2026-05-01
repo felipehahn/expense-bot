@@ -16,25 +16,26 @@ public class TelegramWebhookService {
     private static final String TOPIC_TELEGRAM_COMMAND = "expense-events";
 
     public void process(TelegramUpdateDTO update) {
-
         if (update.getMessage() == null || update.getMessage().getText() == null)
             return;
 
-        String text = update.getMessage().getText();
-
-        if (text.startsWith("/")) publishCommandEvent(update);
+        publishCommandEvent(update);
     }
 
     private void publishCommandEvent(TelegramUpdateDTO update) {
         TelegramMessageDTO message = update.getMessage();
-        String[] messageTextParts = message.getText().split(" ", 2);
+        String text = message.getText();
+
+        String[] messageTextParts = text.startsWith("/") ?
+                text.split(" ", 2)
+                : new String[]{null, text};
 
         TelegramCommandEvent event = new TelegramCommandEvent(
                 message.getChat().getId(),
                 message.getFrom().getId(),
                 buildUserName(message),
                 messageTextParts[0],
-                messageTextParts.length > 1 ? messageTextParts[1] : "",
+                messageTextParts[1],
                 message.getMessageId()
         );
 
