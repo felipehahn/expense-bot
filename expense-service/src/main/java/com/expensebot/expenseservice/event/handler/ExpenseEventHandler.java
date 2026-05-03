@@ -4,6 +4,7 @@ import com.expensebot.contracts.event.TelegramCommandEvent;
 import com.expensebot.expenseservice.event.contract.EventHandler;
 import com.expensebot.expenseservice.dto.ExpenseDTO;
 import com.expensebot.expenseservice.event.publisher.TelegramEventPublisher;
+import com.expensebot.expenseservice.exception.BotException;
 import com.expensebot.expenseservice.service.ExpenseService;
 import com.expensebot.expenseservice.session.UserSession;
 import com.expensebot.expenseservice.session.UserSessionRepository;
@@ -88,7 +89,7 @@ public class ExpenseEventHandler implements EventHandler {
                     .replace(",", ".");
             return new BigDecimal(normalized);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Valor inválido: " + amountString);
+            throw new BotException("Valor inválido: " + amountString);
         }
     }
 
@@ -99,7 +100,7 @@ public class ExpenseEventHandler implements EventHandler {
 
             return LocalDate.parse(dateString, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
         } catch (DateTimeParseException e) {
-            throw new IllegalArgumentException("Data inválida: " + dateString + ". Use o formato dd/MM/yyyy");
+            throw new BotException("Data inválida: " + dateString + ". Use o formato dd/MM/yyyy");
         }
     }
 }
