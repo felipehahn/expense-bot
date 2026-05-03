@@ -5,7 +5,7 @@ import com.expensebot.eventservice.client.TelegramClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 
-public class TelegramResponseConsumer {
+public class TelegramEventConsumer {
     @Autowired
     private TelegramClient telegramClient;
 
