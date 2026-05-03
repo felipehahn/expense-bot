@@ -3,7 +3,7 @@ package com.expensebot.expenseservice.event.handler;
 import com.expensebot.contracts.event.TelegramCommandEvent;
 import com.expensebot.expenseservice.event.contract.EventHandler;
 import com.expensebot.expenseservice.dto.ExpenseDTO;
-import com.expensebot.expenseservice.event.publisher.TelegramResponsePublisher;
+import com.expensebot.expenseservice.event.publisher.TelegramEventPublisher;
 import com.expensebot.expenseservice.service.ExpenseService;
 import com.expensebot.expenseservice.session.UserSession;
 import com.expensebot.expenseservice.session.UserSessionRepository;
@@ -35,7 +35,7 @@ public class ExpenseEventHandler implements EventHandler {
     UserSessionRepository userSessionRepository;
 
     @Autowired
-    TelegramResponsePublisher publisher;
+    TelegramEventPublisher publisher;
 
     @Override
     public String getCommand() {
