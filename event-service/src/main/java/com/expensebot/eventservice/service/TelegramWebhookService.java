@@ -29,12 +29,15 @@ public class TelegramWebhookService {
                 text.split(" ", 2)
                 : new String[]{null, text};
 
+        String command = messageTextParts[0];
+        text = messageTextParts.length > 1 ? messageTextParts[1] : null;
+
         TelegramCommandEvent event = new TelegramCommandEvent(
                 message.getChat().getId(),
                 message.getFrom().getId(),
                 buildUserName(message),
-                messageTextParts[0],
-                messageTextParts[1],
+                command,
+                text,
                 message.getMessageId()
         );
 
