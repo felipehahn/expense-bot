@@ -13,6 +13,6 @@ public class TelegramEventConsumer {
 
     @KafkaListener(topics = "telegram-responses")
     public void consume(TelegramResponseEvent event) {
-        telegramClient.sendMessage(event.chatId(), event.text());
+        telegramClient.sendMessage(event.chatId(), event.text(), event.replyMarkup());
     }
 }

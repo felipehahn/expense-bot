@@ -1,5 +1,6 @@
 package com.expensebot.eventservice.client;
 
+import com.expensebot.contracts.event.TelegramReplyKeyboardMarkup;
 import com.expensebot.eventservice.configuration.TelegramConfigurationProperties;
 import com.expensebot.eventservice.dto.telegram_client.SendMessageRequest;
 import org.springframework.stereotype.Service;
@@ -18,10 +19,10 @@ public class TelegramClient {
                 .build();
     }
 
-    public void sendMessage(Long chatId, String text) {
+    public void sendMessage(Long chatId, String text, TelegramReplyKeyboardMarkup replyMarkup) {
         restClient.post()
                 .uri("/sendMessage")
-                .body(new SendMessageRequest(chatId, text))
+                .body(new SendMessageRequest(chatId, text, replyMarkup))
                 .retrieve()
                 .toBodilessEntity();
     }

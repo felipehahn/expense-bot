@@ -1,5 +1,6 @@
 package com.expensebot.expenseservice.event.publisher;
 
+import com.expensebot.contracts.event.TelegramReplyKeyboardMarkup;
 import com.expensebot.contracts.event.TelegramResponseEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -14,5 +15,9 @@ public class TelegramEventPublisher {
 
     public void send(Long chatId, String text) {
         kafkaTemplate.send(TOPIC, new TelegramResponseEvent(chatId, text));
+    }
+
+    public void send(Long chatId, String text, TelegramReplyKeyboardMarkup replyMarkup) {
+        kafkaTemplate.send(TOPIC, new TelegramResponseEvent(chatId, text, replyMarkup));
     }
 }

@@ -1,3 +1,7 @@
 package com.expensebot.contracts.event;
 
-public record TelegramResponseEvent(Long chatId, String text) {}
+public record TelegramResponseEvent(Long chatId, String text, TelegramReplyKeyboardMarkup replyMarkup ) {
+    public TelegramResponseEvent(Long chatId, String text) {
+        this(chatId, text, null);
+    }
+}
