@@ -34,3 +34,4 @@ build/
 
 ### ENVIROMENT ###
 .env
+.env_prd
