@@ -4,14 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.expensebot</groupId>
-    <artifactId>expense-bot-parent</artifactId>
+    <groupId>com.financebot</groupId>
+    <artifactId>finance-bot-parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>
-        <module>expense-contracts</module>
-        <module>event-service</module>
-        <module>expense-service</module>
+        <module>finance-contracts</module>
+        <module>gateway-service</module>
+        <module>transaction-service</module>
     </modules>
 </project>
