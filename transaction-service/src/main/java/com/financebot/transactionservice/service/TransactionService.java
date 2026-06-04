@@ -1,12 +1,18 @@
 package com.financebot.transactionservice.service;
 
 import com.financebot.transactionservice.dto.TransactionDTO;
+import com.financebot.transactionservice.enums.TransactionType;
+import com.financebot.transactionservice.exception.BotException;
 import com.financebot.transactionservice.model.Transaction;
 import com.financebot.transactionservice.model.User;
 import com.financebot.transactionservice.repository.TransactionRepository;
 import com.financebot.transactionservice.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.util.List;
 
 @Service
 public class TransactionService {
@@ -22,7 +28,20 @@ public class TransactionService {
         return transactionRepository.save(Transaction.create(user, transactionDTO));
     }
 
-    public void delete(Long expenseId) {
-        transactionRepository.deleteById(expenseId);
+    public void delete(Long id, Long userId) {
+        if (!transactionRepository.existsByIdAndUserTelegramId(id, userId))
+            throw new BotException("Transação não encontrada.");
+
+        transactionRepository.deleteById(id);
+    }
+
+    public List<TransactionDTO> findByUserAndPeriod(Long userId, YearMonth yearMonth, TransactionType type
+    ) {
+        return transactionRepository.listTransactionsPeriod(
+                userId,
+                yearMonth.atDay(1),
+                yearMonth.atEndOfMonth(),
+                type
+        );
     }
 }

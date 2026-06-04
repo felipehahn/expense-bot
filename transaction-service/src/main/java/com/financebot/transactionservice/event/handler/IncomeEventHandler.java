@@ -1,6 +1,7 @@
 package com.financebot.transactionservice.event.handler;
 
 import com.financebot.contracts.event.TelegramCommandEvent;
+import com.financebot.contracts.event.TelegramReplyKeyboardRemove;
 import com.financebot.transactionservice.dto.TransactionDTO;
 import com.financebot.transactionservice.enums.TransactionType;
 import com.financebot.transactionservice.event.contract.EventHandler;
@@ -40,13 +41,13 @@ public class IncomeEventHandler implements EventHandler {
     );
 
     @Autowired
-    TransactionService transactionService;
+    private TransactionService transactionService;
 
     @Autowired
-    UserSessionRepository userSessionRepository;
+    private UserSessionRepository userSessionRepository;
 
     @Autowired
-    TelegramEventPublisher publisher;
+    private TelegramEventPublisher publisher;
 
     @Override
     public String getCommand() {
@@ -85,13 +86,14 @@ public class IncomeEventHandler implements EventHandler {
         LocalDate date = parseData(event.text().trim());
 
         transactionService.create(event.userId(), new TransactionDTO(
+                null,
                 (BigDecimal) session.getData().get("amount"),
                 TransactionType.INCOME,
                 (String) session.getData().get("description"),
                 date
         ));
         userSessionRepository.remove(event.userId());
-        publisher.send(event.chatId(), "✅ Receita registrada!");
+        publisher.send(event.chatId(), "✅ Receita registrada!", new TelegramReplyKeyboardRemove());
     }
 
     private BigDecimal parseAmount(String amountString) {

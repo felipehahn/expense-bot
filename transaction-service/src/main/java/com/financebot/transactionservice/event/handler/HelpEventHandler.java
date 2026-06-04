@@ -3,34 +3,30 @@ package com.financebot.transactionservice.event.handler;
 import com.financebot.contracts.event.TelegramCommandEvent;
 import com.financebot.transactionservice.event.contract.EventHandler;
 import com.financebot.transactionservice.event.publisher.TelegramEventPublisher;
-import com.financebot.transactionservice.service.UserService;
 import com.financebot.transactionservice.session.UserSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class InitEventHandler implements EventHandler {
-
-    @Autowired
-    private UserService userService;
+public class HelpEventHandler implements EventHandler {
 
     @Autowired
     private TelegramEventPublisher publisher;
 
     @Override
     public String getCommand() {
-        return "/start";
+        return "/ajuda";
     }
 
     @Override
     public void process(TelegramCommandEvent event, UserSession session) {
-        userService.createIfNotExists(event.userId());
-
-        String text = "Olá, " + event.username() + "! 👋\n\n"
-                + "Bem-vindo ao *Finance Bot*, seu assistente de finanças pessoais.\n\n"
-                + "Com ele você pode registrar despesas e receitas, acompanhar seu saldo "
-                + "e gerar relatórios diretamente pelo Telegram.\n\n"
-                + "Use /ajuda para ver todos os comandos disponíveis.";
+        String text = "Aqui estão os comandos disponíveis:\n\n"
+                + "/despesa — registrar uma despesa\n"
+                + "/receita — registrar uma receita\n"
+                + "/relatorio — gerar relatório por período\n"
+                + "/deltransacao — excluir uma transação\n"
+                + "/cancelar — cancelar a operação atual\n\n"
+                + "Em qualquer etapa, use /cancelar para voltar ao início.";
         publisher.send(event.chatId(), text);
     }
 }

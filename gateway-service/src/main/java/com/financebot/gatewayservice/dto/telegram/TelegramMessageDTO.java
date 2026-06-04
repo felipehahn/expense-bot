@@ -1,23 +1,16 @@
 package com.financebot.gatewayservice.dto.telegram;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
 
-import java.util.List;
-
-@Data
-public class TelegramMessageDTO {
-
+public record TelegramMessageDTO (
     @JsonProperty("message_id")
-    private Long messageId;
+    Long messageId,
 
-    private TelegramUserDTO from;
+    TelegramUserDTO from,
 
-    private TelegramChatDTO chat;
+    TelegramChatDTO chat,
 
-    private Long date;
+    Long date,
 
-    private String text;
-
-    private List<TelegramEntityDTO> entities;
-}
+    String text
+) {}

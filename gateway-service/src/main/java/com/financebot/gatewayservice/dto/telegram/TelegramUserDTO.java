@@ -1,22 +1,16 @@
 package com.financebot.gatewayservice.dto.telegram;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
 
-@Data
-public class TelegramUserDTO {
-
-    private Long id;
-
-    @JsonProperty("is_bot")
-    private Boolean isBot;
+public record TelegramUserDTO (
+    Long id,
 
     @JsonProperty("first_name")
-    private String firstName;
+    String firstName,
 
-    @JsonProperty("last_name")
-    private String lastName;
+    @JsonProperty("is_bot")
+    Boolean isBot,
 
     @JsonProperty("language_code")
-    private String languageCode;
-}
+    String languageCode
+) {}

@@ -1,13 +1,13 @@
 package com.financebot.gatewayservice.dto.telegram;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
 
-@Data
-public class TelegramUpdateDTO {
-
+public record TelegramUpdateDTO (
     @JsonProperty("update_id")
-    private Long updateId;
+    Long updateId,
 
-    private TelegramMessageDTO message;
-}
+    TelegramMessageDTO message,
+
+    @JsonProperty("callback_query")
+    TelegramCallbackQueryDTO callbackQuery
+) {}

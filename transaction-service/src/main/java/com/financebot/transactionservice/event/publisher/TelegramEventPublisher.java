@@ -1,5 +1,6 @@
 package com.financebot.transactionservice.event.publisher;
 
+import com.financebot.contracts.event.TelegramInlineKeyboardMarkup;
 import com.financebot.contracts.event.TelegramReplyKeyboardMarkup;
 import com.financebot.contracts.event.TelegramResponseEvent;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,10 +15,10 @@ public class TelegramEventPublisher {
     private KafkaTemplate<String, TelegramResponseEvent> kafkaTemplate;
 
     public void send(Long chatId, String text) {
-        kafkaTemplate.send(TOPIC, new TelegramResponseEvent(chatId, text));
+        kafkaTemplate.send(TOPIC, new TelegramResponseEvent(chatId, text, null));
     }
 
-    public void send(Long chatId, String text, TelegramReplyKeyboardMarkup replyMarkup) {
+    public void send(Long chatId, String text, Object replyMarkup) {
         kafkaTemplate.send(TOPIC, new TelegramResponseEvent(chatId, text, replyMarkup));
     }
 }

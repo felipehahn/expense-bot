@@ -1,4 +1,4 @@
-package com.financebot.gatewayservice.configuration;
+package com.financebot.gatewayservice.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

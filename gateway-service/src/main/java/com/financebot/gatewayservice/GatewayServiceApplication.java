@@ -1,6 +1,6 @@
 package com.financebot.gatewayservice;
 
-import com.financebot.gatewayservice.configuration.TelegramConfigurationProperties;
+import com.financebot.gatewayservice.config.TelegramConfigurationProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;

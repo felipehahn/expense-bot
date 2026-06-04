@@ -11,23 +11,34 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
+
 @Service
 public class TelegramEventConsumer {
 
     @Autowired
-    ProcessEventFactory processEventFactory;
+    private ProcessEventFactory processEventFactory;
 
     @Autowired
-    UserSessionRepository userSessionRepository;
+    private UserSessionRepository userSessionRepository;
 
     @Autowired
-    TelegramEventPublisher publisher;
+    private TelegramEventPublisher publisher;
+
+    private static final Set<String> PRIORITY_COMMANDS = Set.of("/cancelar");
 
     @KafkaListener(topics = "command-events")
     public void consume(TelegramCommandEvent event) {
         try {
-            UserSession session = userSessionRepository.get(event.userId());
-            String command = session != null ? session.getCommand() : event.command();
+            UserSession session = null;
+            String command;
+
+            if (event.command() != null && PRIORITY_COMMANDS.contains(event.command())) {
+                command = event.command();
+            } else {
+                session = userSessionRepository.get(event.userId());
+                command = session != null ? session.getCommand() : event.command();
+            }
 
             EventHandler handler = processEventFactory.getHandler(command);
             handler.process(event, session);
