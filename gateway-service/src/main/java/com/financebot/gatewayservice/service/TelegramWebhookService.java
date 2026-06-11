@@ -6,6 +6,7 @@ import com.financebot.gatewayservice.dto.telegram.TelegramCallbackQueryDTO;
 import com.financebot.gatewayservice.dto.telegram.TelegramMessageDTO;
 import com.financebot.gatewayservice.dto.telegram.TelegramUpdateDTO;
 import com.financebot.gatewayservice.event.publisher.TelegramEventPublisher;
+import com.financebot.gatewayservice.idempotency.IdempotencyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +21,13 @@ public class TelegramWebhookService {
     @Autowired
     private TelegramClient telegramClient;
 
+    @Autowired
+    private IdempotencyService idempotencyService;
+
     public void process(TelegramUpdateDTO update) {
+        if (!idempotencyService.isNew(update.updateId().toString()))
+            return;
+
         if (update.message() != null && update.message().text() != null) {
             publishCommandEvent(update);
             return;

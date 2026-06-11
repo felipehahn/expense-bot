@@ -29,6 +29,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
               AND t.data >= :startDate
               AND t.data <= :endDate
               AND (:type IS NULL OR t.type = :type)
+            ORDER BY t.data ASC
 """)
     List<TransactionDTO> listTransactionsPeriod(
             @Param("userId") Long userId,

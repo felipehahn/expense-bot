@@ -153,13 +153,13 @@ public class ReportEventHandler implements EventHandler {
                         ? "💰 Receita"
                         : "💸 Despesa";
 
-                sb.append("#")
+                sb.append("# Código: ")
                         .append(t.id())
                         .append(" ")
                         .append(icon)
                         .append("\n");
             } else {
-                sb.append("#")
+                sb.append("# Código: ")
                         .append(t.id())
                         .append("\n");
             }
@@ -169,7 +169,7 @@ public class ReportEventHandler implements EventHandler {
                     .append(t.description())
                     .append(": R$ ")
                     .append(CURRENCY_FORMAT.format(t.amount()))
-                    .append("\n");
+                    .append("\n\n");
         }
 
         BigDecimal total;
