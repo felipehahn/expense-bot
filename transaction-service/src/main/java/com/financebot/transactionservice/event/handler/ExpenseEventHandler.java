@@ -74,14 +74,20 @@ public class ExpenseEventHandler implements EventHandler {
         session.getData().put("amount", parseAmount(event.text()));
         session.setStep(UserSessionStep.WAITING_DESCRIPTION);
         userSessionRepository.save(event.userId(), session);
-        publisher.send(event.chatId(), "Informe uma descrição para o seu gasto:", KeyboardBuilder.build(DEFAULT_DESCRIPTIONS));
+        publisher.send(event.chatId(), "Informe uma descrição para o gasto (até 200 caracteres)." +
+                "\nEscolha uma categoria abaixo ou digite uma específica:", KeyboardBuilder.build(DEFAULT_DESCRIPTIONS));
     }
 
     private void handleDescription(TelegramCommandEvent event, UserSession session) {
-        session.getData().put("description", event.text().trim());
+        String description = event.text().trim();
+        if (description.length() > 200)
+            throw new BotException("A descrição do gasto deve ter no máximo 200 caracteres");
+
+        session.getData().put("description", description);
         session.setStep(UserSessionStep.WAITING_DATE);
         userSessionRepository.save(event.userId(), session);
-        publisher.send(event.chatId(), "Informe uma data para seu gasto(dd/MM/yyyy):",  KeyboardBuilder.build(DEFAULT_DATES));
+        publisher.send(event.chatId(), "Informe a data do gasto no formato dd/MM/yyyy." +
+                "\nEscolha uma opção abaixo ou digite a data:",  KeyboardBuilder.build(DEFAULT_DATES));
     }
 
     private void handleDate(TelegramCommandEvent event, UserSession session) {

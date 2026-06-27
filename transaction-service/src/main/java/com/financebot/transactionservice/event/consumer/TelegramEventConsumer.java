@@ -1,14 +1,15 @@
 package com.financebot.transactionservice.event.consumer;
 
 import com.financebot.contracts.event.TelegramCommandEvent;
+import com.financebot.contracts.messaging.RabbitMQConstants;
 import com.financebot.transactionservice.event.contract.EventHandler;
 import com.financebot.transactionservice.event.factory.ProcessEventFactory;
 import com.financebot.transactionservice.event.publisher.TelegramEventPublisher;
 import com.financebot.transactionservice.exception.BotException;
 import com.financebot.transactionservice.session.UserSession;
 import com.financebot.transactionservice.session.UserSessionRepository;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
@@ -27,7 +28,7 @@ public class TelegramEventConsumer {
 
     private static final Set<String> PRIORITY_COMMANDS = Set.of("/cancelar");
 
-    @KafkaListener(topics = "command-events")
+    @RabbitListener(queues = RabbitMQConstants.COMMAND_QUEUE)
     public void consume(TelegramCommandEvent event) {
         try {
             UserSession session = null;

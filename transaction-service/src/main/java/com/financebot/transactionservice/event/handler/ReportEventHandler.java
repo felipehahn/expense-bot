@@ -17,10 +17,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
@@ -33,7 +34,13 @@ public class ReportEventHandler implements EventHandler {
             UserSessionStep.WAITING_REPORT_DATE, this::handleDate
     );
 
-    private static final DecimalFormat CURRENCY_FORMAT = new DecimalFormat("#,##0.00");
+    private static final NumberFormat CURRENCY_FORMAT;
+
+    static {
+        CURRENCY_FORMAT = NumberFormat.getNumberInstance(new Locale("pt", "BR"));
+        CURRENCY_FORMAT.setMinimumFractionDigits(2);
+        CURRENCY_FORMAT.setMaximumFractionDigits(2);
+    }
 
     @Autowired
     private TransactionService transactionService;
@@ -98,7 +105,7 @@ public class ReportEventHandler implements EventHandler {
 
         session.setStep(UserSessionStep.WAITING_REPORT_DATE);
         userSessionRepository.save(event.userId(), session);
-        publisher.send(event.chatId(), "Informe o período (MM/yyyy):");
+        publisher.send(event.chatId(), "Informe o período no formato MM/yyyy:");
     }
 
     private void handleDate(TelegramCommandEvent event, UserSession session) {
@@ -128,8 +135,7 @@ public class ReportEventHandler implements EventHandler {
         }
     }
 
-    private String buildMessage(List<TransactionDTO> transactions, YearMonth yearMonth, ReportType reportType
-    ) {
+    private String buildMessage(List<TransactionDTO> transactions, YearMonth yearMonth, ReportType reportType) {
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         DateTimeFormatter periodFormatter = DateTimeFormatter.ofPattern("MM/yyyy");
 
@@ -148,63 +154,39 @@ public class ReportEventHandler implements EventHandler {
                 .append("*\n\n");
 
         for (TransactionDTO t : transactions) {
-            if (reportType == ReportType.ALL) {
-                String icon = t.type() == TransactionType.INCOME
-                        ? "💰 Receita"
-                        : "💸 Despesa";
+            String icon = t.type() == TransactionType.INCOME ? "💰 Receita" : "💸 Despesa";
 
-                sb.append("# Código: ")
-                        .append(t.id())
-                        .append(" ")
-                        .append(icon)
-                        .append("\n");
-            } else {
-                sb.append("# Código: ")
-                        .append(t.id())
-                        .append("\n");
+            sb.append("📅 *").append(t.data().format(dateFormatter)).append("*");
+
+            if (reportType == ReportType.ALL) {
+                sb.append(" — ").append(icon);
             }
 
-            sb.append(t.data().format(dateFormatter))
-                    .append(" — ")
-                    .append(t.description())
-                    .append(": R$ ")
-                    .append(CURRENCY_FORMAT.format(t.amount()))
-                    .append("\n\n");
+            sb.append("\n");
+            sb.append("📝 Descrição: ").append(t.description()).append("\n");
+            sb.append("💲 Valor: R$ ").append(CURRENCY_FORMAT.format(t.amount())).append("\n");
+            sb.append("🔑 Identificador: ").append(t.id()).append("\n");
+            sb.append("\n");
         }
-
-        BigDecimal total;
 
         switch (reportType) {
             case EXPENSE -> {
-                total = transactions.stream()
+                BigDecimal total = transactions.stream()
                         .map(TransactionDTO::amount)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-                sb.append("\n *Total de despesas: R$ ")
-                        .append(CURRENCY_FORMAT.format(total))
-                        .append("*");
+                sb.append("💸 *Total de despesas: R$ ").append(CURRENCY_FORMAT.format(total)).append("*");
             }
-
             case INCOME -> {
-                total = transactions.stream()
+                BigDecimal total = transactions.stream()
                         .map(TransactionDTO::amount)
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-                sb.append("\n *Total de receitas: R$ ")
-                        .append(CURRENCY_FORMAT.format(total))
-                        .append("*");
+                sb.append("💰 *Total de receitas: R$ ").append(CURRENCY_FORMAT.format(total)).append("*");
             }
-
             case ALL -> {
-                total = transactions.stream()
-                        .map(t -> t.type() == TransactionType.INCOME
-                                ? t.amount()
-                                : t.amount().negate())
+                BigDecimal total = transactions.stream()
+                        .map(t -> t.type() == TransactionType.INCOME ? t.amount() : t.amount().negate())
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-                sb.append("\n📈 *Saldo: R$ ")
-                        .append(CURRENCY_FORMAT.format(total))
-                        .append("*");
+                sb.append("📈 *Saldo: R$ ").append(CURRENCY_FORMAT.format(total)).append("*");
             }
         }
 

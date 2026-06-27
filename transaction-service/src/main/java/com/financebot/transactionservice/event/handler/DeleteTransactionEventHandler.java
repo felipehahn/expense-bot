@@ -47,14 +47,17 @@ public class DeleteTransactionEventHandler implements EventHandler {
     private void handleInit(TelegramCommandEvent event, UserSession session) {
         session.setStep(UserSessionStep.WAITING_ID);
         userSessionRepository.save(event.userId(), session);
-        publisher.send(event.chatId(), "Informe o código da transação:");
+        publisher.send(event.chatId(), "Informe o identificador da transação:");
     }
 
     private void handleId(TelegramCommandEvent event, UserSession session) {
-        Long id = parseId(event.text());
-        transactionService.delete(id, event.userId());
-        userSessionRepository.remove(event.userId());
-        publisher.send(event.chatId(), "✅ Transação excluída com sucesso!");
+        try {
+            Long id = parseId(event.text());
+            transactionService.delete(id, event.userId());
+            publisher.send(event.chatId(), "✅ Transação excluída com sucesso!");
+        } finally {
+            userSessionRepository.remove(event.userId());
+        }
     }
 
     private Long parseId(String idString) {
