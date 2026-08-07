@@ -36,8 +36,6 @@ flowchart LR
 - Redis
 - PostgreSQL + Flyway
 - Docker / Docker Compose (ambiente local)
-- Deploy: AWS EC2, Nginx, systemd, Let's Encrypt
-- Infraestrutura gerenciada em produção: Supabase (PostgreSQL), CloudAMQP (RabbitMQ), Upstash (Redis)
 
 ## Funcionalidades
 
