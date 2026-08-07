@@ -1,76 +1,76 @@
 # finance-bot
 
-Bot de finanças pessoais desenvolvido com arquitetura de microserviços em Java e Spring Boot, utilizando comunicação assíncrona por mensageria. Permite gerenciar transações financeiras e gerar relatórios de receitas e despesas.
+Personal finance bot built with a microservices architecture in Java and Spring Boot, using asynchronous messaging for communication. Lets you manage financial transactions and generate income/expense reports through Telegram.
 
-## Arquitetura
+## Architecture
 
-O projeto é dividido em três módulos:
+The project is split into three modules:
 
-- **`gateway-service`** — microserviço responsável por receber os webhooks do telegram e postar os eventos que serão consumidos pelo transaction-service. Também consome eventos para enviar as respostas para os usuários no chat.
-- **`transaction-service`** — microserviço responsável por consumir os eventos postados pelo gateway-service, aplicar as regras de negócio, conduzir os fluxos multi-steps e persistir as transações. Ao fim de cada execução, posta eventos que serão consumidos pelo gateway-service para enviar mensagens de resposta no chat
-- **`finance-contracts`** — módulo compartilhado com os contratos (DTOs) usados na comunicação entre os microserviços.
+- **`gateway-service`** — microservice responsible for receiving Telegram webhooks and publishing the events consumed by `transaction-service`. It also consumes events to send responses back to users in the chat.
+- **`transaction-service`** — microservice responsible for consuming the events published by `gateway-service`, applying business rules, driving multi-step flows, and persisting transactions. At the end of each execution, it publishes events that `gateway-service` consumes to send reply messages in the chat.
+- **`finance-contracts`** — shared module with the contracts (DTOs) used for communication between the microservices.
 
-O sistema segue um design **orientado a eventos (event-driven)**: `gateway-service` e `transaction-service` não se comunicam diretamente — a comunicação acontece de forma assíncrona via **RabbitMQ**, com cada serviço publicando/consumindo eventos através dos contratos definidos em `finance-contracts`. O **Redis** é usado para estado de sessão (fluxos conversacionais) e idempotência (inclusive na validação dos webhooks do Telegram). O **PostgreSQL** é o banco de persistência das transações, com migrações via **Flyway**.
+The system follows an **event-driven design**: `gateway-service` and `transaction-service` never talk to each other directly — communication happens asynchronously via **RabbitMQ**, with each service publishing/consuming events through the contracts defined in `finance-contracts`. **Redis** is used for session state (conversational flows) and idempotency (including validating Telegram webhooks). **PostgreSQL** is the persistence store for transactions, with migrations managed by **Flyway**.
 
-### Diagrama
+### Diagram
 
 ```mermaid
 flowchart LR
-    U[Usuário] -->|mensagem| TG[Telegram]
+    U[User] -->|message| TG[Telegram]
     TG -->|webhook| GW[gateway-service]
-    GW <-->|estado de sessão / idempotência| R[(Redis)]
-    GW -->|publica evento| MQ[[RabbitMQ]]
-    MQ -->|consome evento| TS[transaction-service]
+    GW <-->|session state / idempotency| R[(Redis)]
+    GW -->|publishes event| MQ[[RabbitMQ]]
+    MQ -->|consumes event| TS[transaction-service]
     TS <--> DB[(PostgreSQL)]
-    TS -->|evento de resposta| MQ
-    MQ -->|consome evento| GW
-    GW -->|resposta / relatório| TG
-    TG -->|mensagem| U
+    TS -->|reply event| MQ
+    MQ -->|consumes event| GW
+    GW -->|reply / report| TG
+    TG -->|message| U
 ```
 
 ## Stack
 
 - Java 21
-- Spring Boot (microserviços)
+- Spring Boot (microservices)
 - RabbitMQ
 - Redis
 - PostgreSQL + Flyway
-- Docker / Docker Compose (ambiente local)
+- Docker / Docker Compose (local environment)
 
-## Funcionalidades
+## Features
 
-- Registro e gerenciamento de transações via conversa no Telegram
-- Fluxos conversacionais multi-etapa
-- Geração de relatórios
-- Fluxo de exclusão de transações
-- Validação de segurança do webhook do Telegram via secret token, com idempotência via Redis
+- Register and manage transactions through a Telegram conversation
+- Multi-step conversational flows
+- Report generation
+- Transaction deletion flow
+- Telegram webhook security validation via secret token, with idempotency through Redis
 
-## Rodando localmente
+## Running locally
 
-### Pré-requisitos
+### Prerequisites
 
-- Java 21 (o projeto usa a distribuição Corretto)
-- Docker e Docker Compose
-- IntelliJ IDEA (recomendado — instruções específicas abaixo)
+- Java 21 (the project uses the Corretto distribution)
+- Docker and Docker Compose
+- IntelliJ IDEA (recommended — specific instructions below)
 
-### 1. Suba a infraestrutura com Docker Compose
+### 1. Start the infrastructure with Docker Compose
 
-Os serviços de infraestrutura (RabbitMQ, Redis e PostgreSQL) rodam via Docker, usando o `docker-compose.yml` na raiz do projeto. Para subir todos os serviços:
+Infrastructure services (RabbitMQ, Redis, and PostgreSQL) run via Docker, using the `docker-compose.yml` at the project root. To start everything:
 
 ```bash
 docker compose up -d
 ```
 
-Isso disponibiliza:
-- RabbitMQ em `localhost:5672` (management UI em `localhost:15672`, usuário/senha `guest`/`guest`)
-- Redis em `localhost:6379`
-- PostgreSQL em `localhost:5432` (banco `transactions`, usuário `postgres`, senha `root`)
+This makes available:
+- RabbitMQ at `localhost:5672` (management UI at `localhost:15672`, username/password `guest`/`guest`)
+- Redis at `localhost:6379`
+- PostgreSQL at `localhost:5432` (database `transactions`, username `postgres`, password `root`)
 
-### 2. Configure o arquivo `.env`
+### 2. Set up the `.env` file
 
-O build local depende de um arquivo `.env` na raiz do projeto, que centraliza as variáveis de ambiente usadas tanto pelo `gateway-service` quanto pelo `transaction-service`. Ele é referenciado diretamente na configuração de execução do IntelliJ (veja o passo 3).
+The local build depends on a `.env` file at the project root, which centralizes the environment variables used by both `gateway-service` and `transaction-service`. It's referenced directly in the IntelliJ run configuration (see step 3).
 
-Crie um `.env` na raiz com o seguinte conteúdo (ajustando os valores conforme necessário):
+Create a `.env` file at the root with the following content (adjusting the values as needed):
 
 ```env
 RABBITMQ_HOST=localhost
@@ -88,77 +88,77 @@ DB_PASSWORD=root
 
 FLYWAY_ENABLED=true
 
-TELEGRAM_BOT_TOKEN=seu_token_aqui
+TELEGRAM_BOT_TOKEN=your_token_here
 TELEGRAM_BOT_API_URL=https://api.telegram.org
-TELEGRAM_BOT_SECRET_TOKEN=seu_secret_token_aqui
+TELEGRAM_BOT_SECRET_TOKEN=your_secret_token_here
 ```
 
-> ⚠️ O `.env` contém credenciais e tokens — **nunca** deve ser versionado. Certifique-se de que está no `.gitignore`.
+> ⚠️ The `.env` file contains credentials and tokens — it should **never** be committed. Make sure it's in `.gitignore`.
 
-Essas variáveis são referenciadas nos respectivos `application.properties` de cada serviço (`gateway-service` e `transaction-service`).
+These variables are referenced in each service's `application.properties` (`gateway-service` and `transaction-service`).
 
-### 3. Configuração da Run Configuration no IntelliJ
+### 3. IntelliJ Run Configuration setup
 
-Para rodar cada serviço localmente no IntelliJ, crie uma Run Configuration do tipo **Application** com:
+To run each service locally in IntelliJ, create an **Application** run configuration with:
 
 - **JDK**: `21` (Corretto)
-- **Main class**: a classe principal do serviço (ex: `com.financebot.gatewayservice.GatewayServiceApplication` para o `gateway-service`)
+- **Main class**: the service's main class (e.g. `com.financebot.gatewayservice.GatewayServiceApplication` for `gateway-service`)
 - **VM/Program arguments**: `-Dspring.config.location=classpath:/application-local.properties`
-- **Working directory**: a pasta do serviço (ex: `.../finance-bot/gateway-service`)
-- **Environment variables**: aponte para o arquivo `.env` na raiz do projeto (ex: `.../finance-bot/.env`)
+- **Working directory**: the service's folder (e.g. `.../finance-bot/gateway-service`)
+- **Environment variables**: point to the `.env` file at the project root (e.g. `.../finance-bot/.env`)
 
-Repita a mesma configuração para o `transaction-service`, ajustando a main class e o working directory.
+Repeat the same setup for `transaction-service`, adjusting the main class and working directory.
 
-### 4. Instale o módulo `finance-contracts`
+### 4. Install the `finance-contracts` module
 
-O `gateway-service` e o `transaction-service` dependem do `finance-contracts` (os contratos/DTOs compartilhados). Antes de rodar os dois serviços, instale esse módulo no repositório local do Maven:
+`gateway-service` and `transaction-service` depend on `finance-contracts` (the shared contracts/DTOs). Before running either service, install this module into your local Maven repository:
 
 ```bash
 cd finance-contracts
 mvn clean install
 ```
 
-### 5. Suba os serviços
+### 5. Start the services
 
-Com a infraestrutura no ar (passo 1), o `finance-contracts` instalado (passo 4) e as Run Configurations prontas (passo 3), rode `gateway-service` e `transaction-service` pelo IntelliJ.
+With the infrastructure running (step 1), `finance-contracts` installed (step 4), and the run configurations set up (step 3), run `gateway-service` and `transaction-service` from IntelliJ.
 
-### 6. Exponha o `gateway-service` publicamente com ngrok (opcional)
+### 6. Expose `gateway-service` publicly with ngrok (optional)
 
-Como o Telegram só envia webhooks para uma URL pública em HTTPS, e localmente o `gateway-service` roda em `localhost`, é preciso expor essa porta publicamente para testar a integração de ponta a ponta. Uma forma simples é usando o [ngrok](https://ngrok.com/):
+Since Telegram only sends webhooks to a public HTTPS URL, and `gateway-service` runs on `localhost` locally, you need to expose that port publicly to test the end-to-end integration. A simple way is with [ngrok](https://ngrok.com/):
 
 ```bash
 ngrok http 8080
 ```
 
-(ajuste `8080` para a porta em que o `gateway-service` está rodando). O ngrok gera uma URL pública que redireciona para o `localhost`, que pode ser usada ao registrar o webhook do bot (veja a seção "Criando o bot no Telegram").
+(adjust `8080` to whichever port `gateway-service` runs on). ngrok generates a public URL that forwards to `localhost`, which can be used when registering the bot's webhook (see "Setting up the bot on Telegram").
 
-## Comandos do bot
+## Bot commands
 
-| Comando | Descrição |
+| Command | Description |
 |---|---|
-| `/despesa` | Registrar uma despesa |
-| `/receita` | Registrar uma receita |
-| `/relatorio` | Gerar relatório por período |
-| `/deltransacao` | Excluir uma transação |
-| `/ajuda` | Ver todos os comandos disponíveis |
-| `/cancelar` | Cancelar a operação atual |
+| `/despesa` | Register an expense |
+| `/receita` | Register an income |
+| `/relatorio` | Generate a report by period |
+| `/deltransacao` | Delete a transaction |
+| `/ajuda` | View all available commands |
+| `/cancelar` | Cancel the current operation |
 
-## Criando o bot no Telegram
+## Setting up the bot on Telegram
 
-Para obter as credenciais usadas em `TELEGRAM_BOT_TOKEN` e `TELEGRAM_BOT_SECRET_TOKEN`:
+To get the credentials used for `TELEGRAM_BOT_TOKEN` and `TELEGRAM_BOT_SECRET_TOKEN`:
 
-1. Abra uma conversa com o **[@BotFather](https://t.me/BotFather)** no Telegram.
-2. Envie `/newbot` e siga as instruções (nome e username do bot).
-3. O BotFather retornará o **token** de acesso à API — esse é o valor de `TELEGRAM_BOT_TOKEN`.
-4. Defina `TELEGRAM_BOT_API_URL` como `https://api.telegram.org` (padrão da API do Telegram).
-5. Defina um valor próprio (uma string aleatória e secreta) para `TELEGRAM_BOT_SECRET_TOKEN` — ele é usado para validar que os webhooks recebidos realmente vêm do Telegram, via o header `X-Telegram-Bot-Api-Secret-Token`.
-6. Registre o webhook do bot apontando para a URL pública do `gateway-service`, informando o mesmo secret token configurado no passo anterior.
+1. Start a conversation with **[@BotFather](https://t.me/BotFather)** on Telegram.
+2. Send `/newbot` and follow the instructions (bot name and username).
+3. BotFather will return the API access **token** — this is the value for `TELEGRAM_BOT_TOKEN`.
+4. Set `TELEGRAM_BOT_API_URL` to `https://api.telegram.org` (the default Telegram API endpoint).
+5. Set your own value (a random, secret string) for `TELEGRAM_BOT_SECRET_TOKEN` — it's used to validate that incoming webhooks genuinely come from Telegram, via the `X-Telegram-Bot-Api-Secret-Token` header.
+6. Register the bot's webhook pointing to `gateway-service`'s public URL, passing the same secret token configured in the previous step.
 
-## Segurança
+## Security
 
-- Validação do webhook do Telegram via secret token
-- Idempotência de requisições via Redis
+- Telegram webhook validation via secret token
+- Request idempotency through Redis
 
-## Licença
+## License
 
-Este projeto está licenciado sob os termos da licença [MIT](LICENSE).
+This project is licensed under the terms of the [MIT](LICENSE) license.
