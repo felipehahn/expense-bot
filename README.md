@@ -73,7 +73,6 @@ O build local depende de um arquivo `.env` na raiz do projeto, que centraliza as
 Crie um `.env` na raiz com o seguinte conteúdo (ajustando os valores conforme necessário):
 
 ```env
-# RabbitMQ (usado por gateway-service e transaction-service)
 RABBITMQ_HOST=localhost
 RABBITMQ_PORT=5672
 RABBITMQ_USERNAME=guest
