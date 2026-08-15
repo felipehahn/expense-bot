@@ -159,6 +159,20 @@ To get the credentials used for `TELEGRAM_BOT_TOKEN` and `TELEGRAM_BOT_SECRET_TO
 - Telegram webhook validation via secret token
 - Request idempotency through Redis
 
+## Disclaimer
+
+This is a personal, experimental project.
+
+- **Public Telegram bot usage**: by using the bot, you are responsible for the
+  information you provide. There are no guarantees of availability, backups, or
+  security for third-party use, and the author is not liable for data loss or
+  misuse of the information entered.
+- **Running your own instance**: if you choose to run your own instance of this
+  project, you are solely responsible for the security, storage, and handling of
+  the data processed.
+
+Use at your own risk.
+
 ## License
 
 This project is licensed under the terms of the [MIT](LICENSE) license.
